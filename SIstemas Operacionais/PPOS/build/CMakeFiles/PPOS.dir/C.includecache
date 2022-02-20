@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../library/include/queue.h
+
+/home/ayrton/CLionProjects/PPOS/source/queue.c
+stdio.h
+-
+queue.h
+/home/ayrton/CLionProjects/PPOS/source/queue.h
+

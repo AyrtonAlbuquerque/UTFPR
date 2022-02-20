@@ -1,0 +1,3 @@
+/home/ayrton/CLionProjects/PPOS/build/CMakeFiles/edit_cache.dir
+/home/ayrton/CLionProjects/PPOS/build/CMakeFiles/rebuild_cache.dir
+/home/ayrton/CLionProjects/PPOS/build/CMakeFiles/PPOS.dir
