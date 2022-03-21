@@ -24,7 +24,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 #source/pingpong-disco1.c
 #source/pingpong-contab-prio.c
 
-set(SOURCE_FILES test/main.c source/queue.c)
+# Tests:
+#p1: test/main.c source/queue.c
+#p2: test/pingpong-tasks1.c test/pingpong-tasks2.c test/pingpong-tasks3.c source/ppos-core.c
+
+set(SOURCE_FILES test/main.c source/queue.c source/ppos-core.c)
 
 add_executable(PPOS ${SOURCE_FILES})
 

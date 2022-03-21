@@ -1,1 +1,0 @@
-/usr/bin/cc -g CMakeFiles/PPOS.dir/test/main.c.o CMakeFiles/PPOS.dir/source/queue.c.o -o PPOS  ../library/lib/libppos_static.a 
