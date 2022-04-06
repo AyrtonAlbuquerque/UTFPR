@@ -10,31 +10,28 @@
 
 #define MAXTASK 1000
 
-task_t task ;
+task_t task;
 
 // corpo das threads
-void BodyTask (void * arg)
-{
-   printf ("Estou na tarefa %5d\n", task_id()) ;
-   task_exit (0) ;
+void BodyTask(void *arg) {
+    printf("Estou na tarefa %5d\n", task_id());
+    task_exit(0);
 }
 
-int main (int argc, char *argv[])
-{
-   int i ;
+int main(int argc, char *argv[]) {
+    int i;
 
-   printf ("main: inicio\n");
+    printf("main: inicio\n");
 
-   ppos_init () ;
+    ppos_init();
 
-   // cria MAXTASK tarefas, ativando cada uma apos sua criacao
-   for (i=0; i<MAXTASK; i++)
-   {
-     task_create (&task, BodyTask, NULL) ;
-     task_switch (&task) ;
-   }
+    // cria MAXTASK tarefas, ativando cada uma apos sua criacao
+    for (i = 0; i < MAXTASK; i++) {
+        task_create(&task, BodyTask, NULL);
+        task_switch(&task);
+    }
 
-   printf ("main: fim\n");
+    printf("main: fim\n");
 
-   exit (0);
+    exit(0);
 }

@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.20)
 project(PPOS C)
 
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-#test/main.c
+#test/queue_test.c
 #source/disk.c
 #source/queue.c
 #source/timer.c
@@ -25,10 +26,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 #source/pingpong-contab-prio.c
 
 # Tests:
-#p1: test/main.c source/queue.c
-#p2: test/pingpong-tasks1.c test/pingpong-tasks2.c test/pingpong-tasks3.c source/ppos-core.c
+#P1: test/queue_test.c source/queue.c
+#P2: test/pingpong-tasks1.c source/ppos-core.c | test/pingpong-tasks2.c source/ppos-core.c | test/pingpong-tasks3.c source/ppos-core.c
 
-set(SOURCE_FILES test/main.c source/queue.c source/ppos-core.c)
+set(SOURCE_FILES test/pingpong-tasks1.c source/ppos-core.c)
 
 add_executable(PPOS ${SOURCE_FILES})
 
