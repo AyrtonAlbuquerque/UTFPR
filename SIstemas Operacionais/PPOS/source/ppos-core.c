@@ -98,10 +98,10 @@ int task_switch(task_t *task) {
     task_t *aux = current_task;
 
     // If the task is not null and is not the current task
-    if (task && task != current_task) {
-        current_task->state = PPOS_TASK_STATE_SUSPENDED;        // Update current task state
-        current_task = task;                                    // Set current task to the task to be switched
-        current_task->state = PPOS_TASK_STATE_EXECUTING;        // Update current task state
+    if (task != current_task) {
+        // Set current task to the task to be switched and update its state
+        current_task = task;
+        current_task->state = PPOS_TASK_STATE_EXECUTING;
 
 #ifdef DEBUG
         printf("[PPOS-CORE|SWITCH]: Switching tasks %d -> %d.\n", aux->id, task->id);
