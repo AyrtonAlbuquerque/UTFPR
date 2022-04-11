@@ -30,7 +30,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 #P2: test/pingpong-tasks1.c source/ppos-core.c | test/pingpong-tasks2.c source/ppos-core.c | test/pingpong-tasks3.c source/ppos-core.c
 #P3: test/pingpong-dispatcher.c source/ppos-core.c
 
-set(SOURCE_FILES test/pingpong-tasks3.c source/ppos-core.c)
+set(SOURCE_FILES test/pingpong-dispatcher.c source/ppos-core.c)
 
 add_executable(PPOS ${SOURCE_FILES})
 
