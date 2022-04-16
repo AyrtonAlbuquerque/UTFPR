@@ -2,7 +2,7 @@
 // Prof. Carlos A. Maziero, DINF UFPR
 // Versão 1.4 -- Janeiro de 2022
 
-// Teste do task dispatcher e escalonador FCFS
+// Teste do escalonador por prioridades dinâmicas
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,8 +14,9 @@ task_t Pang, Peng, Ping, Pong, Pung;
 void Body(void *arg) {
     int i;
 
-    printf("%s: inicio\n", (char *) arg);
-    for (i = 0; i < 5; i++) {
+    printf("%s: inicio (prioridade %d)\n", (char *) arg, task_getprio(NULL));
+
+    for (i = 0; i < 10; i++) {
         printf("%s: %d\n", (char *) arg, i);
         task_yield();
     }
@@ -29,10 +30,19 @@ int main(int argc, char *argv[]) {
     ppos_init();
 
     task_create(&Pang, Body, "    Pang");
+    task_setprio(&Pang, 0);
+
     task_create(&Peng, Body, "        Peng");
+    task_setprio(&Peng, 2);
+
     task_create(&Ping, Body, "            Ping");
+    task_setprio(&Ping, 4);
+
     task_create(&Pong, Body, "                Pong");
+    task_setprio(&Pong, 6);
+
     task_create(&Pung, Body, "                    Pung");
+    task_setprio(&Pung, 8);
 
     task_yield();
 

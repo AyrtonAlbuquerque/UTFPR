@@ -2,31 +2,39 @@
 // Prof. Carlos A. Maziero, DINF UFPR
 // Versão 1.4 -- Janeiro de 2022
 
-// Teste do task dispatcher e escalonador FCFS
+// Teste da tarefa main escalonável
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "ppos.h"
 
+#define WORKLOAD 40000
+
 task_t Pang, Peng, Ping, Pong, Pung;
+
+// simula um processamento pesado
+int hardwork(int n) {
+    int i, j, soma;
+
+    soma = 0;
+    for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
+            soma += j;
+    return (soma);
+}
 
 // corpo das threads
 void Body(void *arg) {
-    int i;
-
-    printf("%s: inicio\n", (char *) arg);
-    for (i = 0; i < 5; i++) {
-        printf("%s: %d\n", (char *) arg, i);
-        task_yield();
-    }
-    printf("%s: fim\n", (char *) arg);
+    printf("%s: inicio em %4d ms\n", (char *) arg, systime());
+    hardwork(WORKLOAD);
+    printf("%s: fim    em %4d ms\n", (char *) arg, systime());
     task_exit(0);
 }
 
 int main(int argc, char *argv[]) {
-    printf("main: inicio\n");
-
     ppos_init();
+
+    printf("main: inicio em %4d ms\n", systime());
 
     task_create(&Pang, Body, "    Pang");
     task_create(&Peng, Body, "        Peng");
@@ -34,8 +42,10 @@ int main(int argc, char *argv[]) {
     task_create(&Pong, Body, "                Pong");
     task_create(&Pung, Body, "                    Pung");
 
-    task_yield();
+    hardwork(0.75 * WORKLOAD);
 
-    printf("main: fim\n");
+    printf("main: fim    em %4d ms\n", systime());
+    task_exit(0);
+
     exit(0);
 }

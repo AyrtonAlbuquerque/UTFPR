@@ -11,31 +11,24 @@
 #endif
 
 // estrutura que define um tratador de sinal (deve ser global ou static)
-struct sigaction action ;
-
-int sair = 0;
+struct sigaction action;
 
 /* função que tratará os sinais recebidos */
-void tratador (int signum)
-{
-    printf ("Recebi o sinal %d\n", signum) ;
-    sair = (signum == SIGINT);
+void tratador(int signum) {
+    printf("Recebi o sinal %d\n", signum);
 }
 
-int main (void)
-{
+int main(void) {
     // registra a ação para o sinal SIGINT
-    action.sa_handler = tratador ;
-    sigemptyset (&action.sa_mask) ;
-    action.sa_flags = 0 ;
-    if (sigaction (SIGINT, &action, 0) < 0)
-    {
-        perror ("Erro em sigaction: ") ;
-        exit (1) ;
+    action.sa_handler = tratador;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+
+    if (sigaction(SIGINT, &action, 0) < 0) {
+        perror("Erro em sigaction: ");
+        exit(1);
     }
 
     /* laço vazio */
-    while (!sair) {
-
-    };
+    while (1);
 }

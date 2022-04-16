@@ -1,71 +1,66 @@
 // PingPongOS - PingPong Operating System
 // Prof. Carlos A. Maziero, DINF UFPR
-// Versão 1.1 -- Julho de 2016
+// Versão 1.4 -- Janeiro de 2022
 
 // Estruturas de dados internas do sistema operacional
 
 #ifndef __PPOS_DATA__
 #define __PPOS_DATA__
 
-#include <stdio.h>
-#include <ucontext.h>		// biblioteca POSIX de trocas de contexto
-#include "queue.h"		// biblioteca de filas genéricas
+#include <ucontext.h>                   // biblioteca POSIX de trocas de contexto
+#include "queue.h"                      // biblioeca de filas
 
 // Estrutura que define um Task Control Block (TCB)
-typedef struct task_t
-{
-    struct task_t *prev, *next ;		// ponteiros para usar em filas
-    int id ;				// identificador da tarefa
-    ucontext_t context ;			// contexto armazenado da tarefa
-    unsigned char state;  // indica o estado de uma tarefa (ver defines no final do arquivo ppos.h):
-    // n - nova, r - pronta, x - executando, s - suspensa, e - terminada
-    struct task_t* queue;
-    struct task_t* joinQueue;
-    int exitCode;
-    unsigned int awakeTime; // used to store the time when it should be waked up
-
-    // ... (outros campos deve ser adicionados APOS esse comentario)
-
-} task_t ;
+typedef struct task_t {
+    struct task_t *prev, *next;         // ponteiros para usar em filas
+    int id;                             // identificador da tarefa
+    ucontext_t context;                 // contexto armazenado da tarefa
+    short status;                       // pronta, rodando, suspensa, ...
+    short preemptable;                  // pode ser preemptada?
+    int exitCode;                       // Código de sáida da tarefa
+    int prio, d_prio;                   // prioridades estática e dinâmica
+    // ... (outros campos serão adicionados mais tarde)
+} task_t;
 
 // estrutura que define um semáforo
 typedef struct {
-    struct task_t *queue;
-    int value;
-
-    unsigned char active;
-} semaphore_t ;
+    // preencher quando necessário
+} semaphore_t;
 
 // estrutura que define um mutex
 typedef struct {
-    struct task_t *queue;
-    unsigned char value;
-
-    unsigned char active;
-} mutex_t ;
+    // preencher quando necessário
+} mutex_t;
 
 // estrutura que define uma barreira
 typedef struct {
-    struct task_t *queue;
-    int maxTasks;
-    int countTasks;
-    unsigned char active;
-    mutex_t mutex;
-} barrier_t ;
+    // preencher quando necessário
+} barrier_t;
 
 // estrutura que define uma fila de mensagens
 typedef struct {
-    void* content;
-    int messageSize;
-    int maxMessages;
-    int countMessages;
+    // preencher quando necessário
+} mqueue_t;
 
-    semaphore_t sBuffer;
-    semaphore_t sItem;
-    semaphore_t sVaga;
+/* -------------------------------------------------------------------------- */
+/*                                   Defines                                  */
+/* -------------------------------------------------------------------------- */
 
-    unsigned char active;
-} mqueue_t ;
+/* ------------------------------- Task Status ------------------------------ */
+#define TASK_NEW            0
+#define TASK_READY          1
+#define TASK_EXECUTING      2
+#define TASK_SUSPENDED      3
+#define TASK_TERMINATED     4
+
+/* -------------------------------- Stacksize ------------------------------- */
+#define STACKSIZE           32768
+
+/* ------------------------------- Priorities ------------------------------- */
+#define DEFAULT_PRIO        0
+#define HIGHEST_PRIO        20
+#define LOWEST_PRIO         -20
+#define AGING_ALPHA         -1
 
 #endif
 

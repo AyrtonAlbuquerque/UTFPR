@@ -9,8 +9,7 @@
 int task_index = 1;
 task_t main_task, dispatcher_task;
 task_t *current_task;
-// Queues
-task_t *ready, *executing, *suspended, *terminated;
+task_t *ready, *executing, *suspended, *terminated; // Queues
 
 /* -------------------------------------------------------------------------- */
 /*                                  Functions                                 */
@@ -30,13 +29,15 @@ void ppos_init() {
     main_task.id = 0;
     main_task.next = NULL;
     main_task.prev = NULL;
+    main_task.prio = DEFAULT_PRIO;
+    main_task.d_prio = 0;
 
     // Save main task context
     getcontext(&(main_task.context));
 
     // Set current task to main task and update its state
     current_task = &main_task;
-    current_task->state = PPOS_TASK_STATE_EXECUTING;
+    current_task->status = TASK_EXECUTING;
 
     // Create dispatcher task with task_create
     task_create(&dispatcher_task, (void *) dispatcher, NULL);
@@ -73,11 +74,13 @@ int task_create(task_t *task, void (*start_func)(void *), void *arg) {
         task->id = task_index++;
         task->next = NULL;
         task->prev = NULL;
-        task->state = PPOS_TASK_STATE_NEW;
+        task->status = TASK_NEW;
+        task->prio = DEFAULT_PRIO;
+        task->d_prio = 0;
 
         // If not the dispatcher task, insert in the ready queue
         if (task != &dispatcher_task) {
-            task->state = PPOS_TASK_STATE_READY;
+            task->status = TASK_READY;
             queue_append((queue_t **) &ready, (queue_t *) task);
         }
 
@@ -97,7 +100,7 @@ void task_exit(int exitCode) {
         task_switch(&main_task);
     } else {
         // Update current task state and exit code
-        current_task->state = PPOS_TASK_STATE_TERMINATED;
+        current_task->status = TASK_TERMINATED;
         current_task->exitCode = exitCode;
 
 #ifdef DEBUG
@@ -114,7 +117,7 @@ int task_switch(task_t *task) {
     if (task != current_task) {
         // Set current task to the task to be switched and update its state
         current_task = task;
-        current_task->state = PPOS_TASK_STATE_EXECUTING;
+        current_task->status = TASK_EXECUTING;
 
 #ifdef DEBUG
         printf("[PPOS-CORE|SWITCH]: Switching tasks %d -> %d.\n", aux->id, task->id);
@@ -136,15 +139,34 @@ int task_id() {
 
 void task_yield() {
     // Update current task state
-    current_task->state = PPOS_TASK_STATE_READY;
+    current_task->status = TASK_READY;
     // Switch to dispatcher task
     task_switch(&dispatcher_task);
 }
 
 task_t *scheduler() {
+    task_t *task = ready;
+
     // If there are tasks in the ready queue
     if (queue_size((queue_t *) ready) > 0) {
-        return ready;   //FCFS
+        // For each task in the ready queue
+        for (task_t *node = task->next; node != ready; node = node->next) {
+            // If node prio is <= than task prio, node has priority over task
+            if (node->d_prio <= task->d_prio) {
+                // Apply aging without breaking lower bound
+                task->d_prio = (task->d_prio > LOWEST_PRIO) ? task->d_prio += AGING_ALPHA : LOWEST_PRIO;
+                // Update chosen task
+                task = node;
+            } else {
+                // task has priority over node, just apply aging to node
+                node->d_prio = (node->d_prio > LOWEST_PRIO) ? node->d_prio += AGING_ALPHA : LOWEST_PRIO;
+            }
+        }
+        // Reset dynamic priority for the chosen task to its static priority
+        task->d_prio = task->prio;
+
+        // Return chosen task
+        return task;
     }
     return NULL;
 }
@@ -164,17 +186,17 @@ void dispatcher() {
             task_switch(task);
 
             // Insert the task in the proper queue
-            switch (task->state) {
-                case PPOS_TASK_STATE_READY:
+            switch (task->status) {
+                case TASK_READY:
                     queue_append((queue_t **) &ready, (queue_t *) task);
                     break;
-                case PPOS_TASK_STATE_EXECUTING:
+                case TASK_EXECUTING:
                     queue_append((queue_t **) &executing, (queue_t *) task);
                     break;
-                case PPOS_TASK_STATE_SUSPENDED:
+                case TASK_SUSPENDED:
                     queue_append((queue_t **) &suspended, (queue_t *) task);
                     break;
-                case PPOS_TASK_STATE_TERMINATED:
+                case TASK_TERMINATED:
                     queue_append((queue_t **) &terminated, (queue_t *) task);
                     break;
             }
@@ -183,4 +205,20 @@ void dispatcher() {
         }
     }
     task_exit(0);
+}
+
+void task_setprio(task_t *task, int prio) {
+    // If task is null than current task
+    task = !task ? current_task : task;
+
+    // If prio is lower than -20 than set lo lower bound. If prio is greater than 20 than set to 20
+    task->prio = (prio < LOWEST_PRIO) ? LOWEST_PRIO : ((prio > HIGHEST_PRIO) ? HIGHEST_PRIO : prio);
+    task->d_prio = task->prio;
+}
+
+int task_getprio(task_t *task) {
+    // If task is null, than current task
+    task = !task ? current_task : task;
+
+    return task->prio;
 }
