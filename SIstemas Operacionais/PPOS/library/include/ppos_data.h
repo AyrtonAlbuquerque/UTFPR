@@ -19,6 +19,9 @@ typedef struct task_t {
     short preemptable;                  // pode ser preemptada?
     int exitCode;                       // código de sáida da tarefa
     int prio, d_prio;                   // prioridades estática e dinâmica
+    unsigned int startTime;             // métrica de tempo de início
+    unsigned int cpuTime;               // métrica de tempo de processamento
+    unsigned int activations;           // métrica de número de ativações
     // ... (outros campos serão adicionados mais tarde)
 } task_t;
 

@@ -15,6 +15,7 @@ task_t *current_task;
 task_t *ready, *executing, *suspended, *terminated;
 struct sigaction action;
 struct itimerval timer;
+unsigned int systick;
 
 
 /* -------------------------------------------------------------------------- */
@@ -25,6 +26,8 @@ task_t *scheduler();
 void dispatcher();
 
 void timer_handler(int signum);
+
+unsigned int systime();
 
 /* -------------------------------------------------------------------------- */
 /*                               Implementation                               */
@@ -46,6 +49,9 @@ void ppos_init() {
     timer.it_value.tv_sec = 0;
     timer.it_interval.tv_usec = TICKS;
     timer.it_interval.tv_sec = 0;
+
+    // Reset systick
+    systick = 0;
 
     // setitimer
     if (setitimer(ITIMER_REAL, &timer, 0) < 0) {
@@ -107,6 +113,9 @@ int task_create(task_t *task, void (*start_func)(void *), void *arg) {
         task->status = TASK_NEW;
         task->prio = task->d_prio = DEFAULT_PRIO;
         task->preemptable = 0;
+        task->startTime = systime();
+        task->cpuTime = 0;
+        task->activations = 0;
 
         // If not the dispatcher task, insert in the ready queue
         if (task != &dispatcher_task) {
@@ -126,6 +135,14 @@ int task_create(task_t *task, void (*start_func)(void *), void *arg) {
 }
 
 void task_exit(int exitCode) {
+#ifdef DEBUG
+    printf("[PPOS-CORE|EXIT]: The task %d will be terminated.\n", current_task->id);
+#endif
+
+    // Display metrics
+    printf("Task %d exit: execution time  %4d ms, processor time  %4d ms, %4d activations\n", current_task->id,
+           systime() - current_task->startTime, current_task->cpuTime, current_task->activations);
+
     // If the current task is the dispatcher task, switch to main, else switch to dispatcher
     if (current_task == &dispatcher_task) {
         task_switch(&main_task);
@@ -133,10 +150,7 @@ void task_exit(int exitCode) {
         // Update current task state and exit code
         current_task->status = TASK_TERMINATED;
         current_task->exitCode = exitCode;
-
-#ifdef DEBUG
-        printf("[PPOS-CORE|EXIT]: The task %d will be terminated.\n", current_task->id);
-#endif
+        // Switch to dispatcher
         task_switch(&dispatcher_task);
     }
 }
@@ -146,8 +160,9 @@ int task_switch(task_t *task) {
 
     // If the task is not null and is not the current task
     if (task != current_task) {
-        // Set current task to the task to be switched and update its state
+        // Set current task to the task to be switched and update its state and activations
         current_task = task;
+        current_task->activations++;
         current_task->status = TASK_EXECUTING;
         // Update the quantum
         quantum = QUANTUM;
@@ -257,13 +272,29 @@ int task_getprio(task_t *task) {
 }
 
 void timer_handler(int signum) {
-    // If preemptable task (not system task) and is a timer interruption
-    if (current_task->preemptable && signum == SIGALRM) {
-        // If quantum is 0 yield, else decrement
-        if (quantum == 0) {
-            task_yield();
-        } else {
-            quantum--;
+    // If timer interruption
+    if (signum == SIGALRM) {
+        // Update systick
+        systick++;
+
+        // If current task is not null
+        if (current_task) {
+            // Update task processor time
+            current_task->cpuTime++;
+
+            // If preemptable task (not system task)
+            if (current_task->preemptable) {
+                // If quantum is 0 yield, else decrement
+                if (quantum == 0) {
+                    task_yield();
+                } else {
+                    quantum--;
+                }
+            }
         }
     }
+}
+
+unsigned int systime() {
+    return systick;
 }
