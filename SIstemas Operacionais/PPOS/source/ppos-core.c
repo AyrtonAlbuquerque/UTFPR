@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <sys/time.h>
 #include "ppos.h"
 #include "ppos_data.h"
 
@@ -7,9 +9,13 @@
 /*                                   Globals                                  */
 /* -------------------------------------------------------------------------- */
 int task_index = 1;
+int quantum;
 task_t main_task, dispatcher_task;
 task_t *current_task;
-task_t *ready, *executing, *suspended, *terminated; // Queues
+task_t *ready, *executing, *suspended, *terminated;
+struct sigaction action;
+struct itimerval timer;
+
 
 /* -------------------------------------------------------------------------- */
 /*                                  Functions                                 */
@@ -18,10 +24,35 @@ task_t *scheduler();
 
 void dispatcher();
 
+void timer_handler(int signum);
+
 /* -------------------------------------------------------------------------- */
 /*                               Implementation                               */
 /* -------------------------------------------------------------------------- */
 void ppos_init() {
+    // Setup sigaction
+    action.sa_handler = timer_handler;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+
+    // sigaction
+    if (sigaction(SIGALRM, &action, 0) < 0) {
+        perror("[PPOS-CORE|SIGACTION]: Error while setting up sigaction.");
+        exit(1);
+    }
+
+    // Setup timer
+    timer.it_value.tv_usec = TICKS;
+    timer.it_value.tv_sec = 0;
+    timer.it_interval.tv_usec = TICKS;
+    timer.it_interval.tv_sec = 0;
+
+    // setitimer
+    if (setitimer(ITIMER_REAL, &timer, 0) < 0) {
+        perror("[PPOS-CORE|ITIMERVAL]: Error while setting up timer.");
+        exit(1);
+    }
+
     // Turn off stdout buffer
     setvbuf(stdout, 0, _IONBF, 0);
 
@@ -29,8 +60,7 @@ void ppos_init() {
     main_task.id = 0;
     main_task.next = NULL;
     main_task.prev = NULL;
-    main_task.prio = DEFAULT_PRIO;
-    main_task.d_prio = 0;
+    main_task.prio = main_task.d_prio = DEFAULT_PRIO;
 
     // Save main task context
     getcontext(&(main_task.context));
@@ -75,12 +105,13 @@ int task_create(task_t *task, void (*start_func)(void *), void *arg) {
         task->next = NULL;
         task->prev = NULL;
         task->status = TASK_NEW;
-        task->prio = DEFAULT_PRIO;
-        task->d_prio = 0;
+        task->prio = task->d_prio = DEFAULT_PRIO;
+        task->preemptable = 0;
 
         // If not the dispatcher task, insert in the ready queue
         if (task != &dispatcher_task) {
             task->status = TASK_READY;
+            task->preemptable = 1;
             queue_append((queue_t **) &ready, (queue_t *) task);
         }
 
@@ -118,6 +149,8 @@ int task_switch(task_t *task) {
         // Set current task to the task to be switched and update its state
         current_task = task;
         current_task->status = TASK_EXECUTING;
+        // Update the quantum
+        quantum = QUANTUM;
 
 #ifdef DEBUG
         printf("[PPOS-CORE|SWITCH]: Switching tasks %d -> %d.\n", aux->id, task->id);
@@ -151,8 +184,8 @@ task_t *scheduler() {
     if (queue_size((queue_t *) ready) > 0) {
         // For each task in the ready queue
         for (task_t *node = task->next; node != ready; node = node->next) {
-            // If node prio is <= than task prio, node has priority over task
-            if (node->d_prio <= task->d_prio) {
+            // If node prio is < than task prio, node has priority over task
+            if (node->d_prio < task->d_prio) {
                 // Apply aging without breaking lower bound
                 task->d_prio = (task->d_prio > LOWEST_PRIO) ? task->d_prio += AGING_ALPHA : LOWEST_PRIO;
                 // Update chosen task
@@ -221,4 +254,16 @@ int task_getprio(task_t *task) {
     task = !task ? current_task : task;
 
     return task->prio;
+}
+
+void timer_handler(int signum) {
+    // If preemptable task (not system task) and is a timer interruption
+    if (current_task->preemptable && signum == SIGALRM) {
+        // If quantum is 0 yield, else decrement
+        if (quantum == 0) {
+            task_yield();
+        } else {
+            quantum--;
+        }
+    }
 }

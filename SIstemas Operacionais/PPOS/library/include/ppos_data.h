@@ -17,7 +17,7 @@ typedef struct task_t {
     ucontext_t context;                 // contexto armazenado da tarefa
     short status;                       // pronta, rodando, suspensa, ...
     short preemptable;                  // pode ser preemptada?
-    int exitCode;                       // Código de sáida da tarefa
+    int exitCode;                       // código de sáida da tarefa
     int prio, d_prio;                   // prioridades estática e dinâmica
     // ... (outros campos serão adicionados mais tarde)
 } task_t;
@@ -61,6 +61,10 @@ typedef struct {
 #define HIGHEST_PRIO        20
 #define LOWEST_PRIO         -20
 #define AGING_ALPHA         -1
+
+/* ------------------------------- Preemption ------------------------------- */
+#define QUANTUM             20
+#define TICKS               1000
 
 #endif
 
