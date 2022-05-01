@@ -1,0 +1,1 @@
+Smart Recycler inference project
