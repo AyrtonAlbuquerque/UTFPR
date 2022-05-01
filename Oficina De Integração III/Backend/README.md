@@ -1,1 +1,0 @@
-Smart Recycler Backend project

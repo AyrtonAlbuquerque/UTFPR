@@ -1,1 +1,0 @@
-Smart Recycler embedded project
