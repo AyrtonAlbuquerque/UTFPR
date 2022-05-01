@@ -33,12 +33,17 @@ unsigned int systime();
 /*                               Implementation                               */
 /* -------------------------------------------------------------------------- */
 void ppos_init() {
+    // Reset systick
+    systick = 0;
+
+    // Turn off stdout buffer
+    setvbuf(stdout, 0, _IONBF, 0);
+
     // Setup sigaction
     action.sa_handler = timer_handler;
     sigemptyset(&action.sa_mask);
     action.sa_flags = 0;
 
-    // sigaction
     if (sigaction(SIGALRM, &action, 0) < 0) {
         perror("[PPOS-CORE|SIGACTION]: Error while setting up sigaction.");
         exit(1);
@@ -50,33 +55,36 @@ void ppos_init() {
     timer.it_interval.tv_usec = TICKS;
     timer.it_interval.tv_sec = 0;
 
-    // Reset systick
-    systick = 0;
-
-    // setitimer
     if (setitimer(ITIMER_REAL, &timer, 0) < 0) {
         perror("[PPOS-CORE|ITIMERVAL]: Error while setting up timer.");
         exit(1);
     }
-
-    // Turn off stdout buffer
-    setvbuf(stdout, 0, _IONBF, 0);
 
     // Setup main task
     main_task.id = 0;
     main_task.next = NULL;
     main_task.prev = NULL;
     main_task.prio = main_task.d_prio = DEFAULT_PRIO;
+    main_task.preemptable = 1;
+    main_task.status = TASK_READY;
+    main_task.startTime = systime();
+    main_task.cpuTime = 0;
+    main_task.activations = 0;
 
     // Save main task context
     getcontext(&(main_task.context));
 
-    // Set current task to main task and update its state
+    // Insert main task in the ready queue
+    queue_append((queue_t **) &ready, (queue_t *) &main_task);
+
+    // Set current task to main task
     current_task = &main_task;
-    current_task->status = TASK_EXECUTING;
 
     // Create dispatcher task with task_create
     task_create(&dispatcher_task, (void *) dispatcher, NULL);
+
+    // Switch to the dispatcher
+    task_switch(&dispatcher_task);
 
     // Init done
 #ifdef DEBUG
@@ -110,16 +118,15 @@ int task_create(task_t *task, void (*start_func)(void *), void *arg) {
         task->id = task_index++;
         task->next = NULL;
         task->prev = NULL;
-        task->status = TASK_NEW;
+        task->status = TASK_READY;
         task->prio = task->d_prio = DEFAULT_PRIO;
         task->preemptable = 0;
         task->startTime = systime();
         task->cpuTime = 0;
         task->activations = 0;
 
-        // If not the dispatcher task, insert in the ready queue
+        // If not the dispatcher task, insert in the ready queue and make it preemptable
         if (task != &dispatcher_task) {
-            task->status = TASK_READY;
             task->preemptable = 1;
             queue_append((queue_t **) &ready, (queue_t *) task);
         }
@@ -158,27 +165,18 @@ void task_exit(int exitCode) {
 int task_switch(task_t *task) {
     task_t *aux = current_task;
 
-    // If the task is not null and is not the current task
-    if (task != current_task) {
-        // Set current task to the task to be switched and update its state and activations
-        current_task = task;
-        current_task->activations++;
-        current_task->status = TASK_EXECUTING;
-        // Update the quantum
-        quantum = QUANTUM;
+    // Set current task to the task to be switched and update its state and activations
+    current_task = task;
+    current_task->activations++;
+    current_task->status = TASK_EXECUTING;
+    // Update the quantum
+    quantum = QUANTUM;
 
 #ifdef DEBUG
-        printf("[PPOS-CORE|SWITCH]: Switching tasks %d -> %d.\n", aux->id, task->id);
+    printf("[PPOS-CORE|SWITCH]: Switching tasks %d -> %d.\n", aux->id, task->id);
 #endif
-        // Swap the contexts
-        return swapcontext(&(aux->context), &(task->context));
-    }
-
-#ifdef DEBUG
-    printf("[PPOS-CORE|SWITCH]: The task were either not initialized or is the current executing task.\n");
-#endif
-
-    return -1;
+    // Swap the contexts
+    return swapcontext(&(aux->context), &(task->context));
 }
 
 int task_id() {
