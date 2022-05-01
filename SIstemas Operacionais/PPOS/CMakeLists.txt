@@ -14,8 +14,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 #P5: test/pingpong-preempcao.c source/ppos-core.c | test/pingpong-preempcao-stress.c source/ppos-core.c
 #P6: test/pingpong-contab.c source/ppos-core.c | test/pingpong-contab-prio.c source/ppos-core.c
 #P7: test/pingpong-maintask.c source/ppos-core.c
+#A8: test/nada.c source/queue.c | test/alternancia.c source/queue.c | test/peterson.c source/queue.c | test/temporizado.c source/queue.c
 
-set(SOURCE_FILES test/pingpong-maintask.c source/ppos-core.c)
+set(SOURCE_FILES test/temporizado.c source/queue.c)
 
 add_executable(PPOS ${SOURCE_FILES})
 
