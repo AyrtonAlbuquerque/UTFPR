@@ -22,7 +22,7 @@ typedef struct task_t {
     unsigned int startTime;             // métrica de tempo de início
     unsigned int cpuTime;               // métrica de tempo de processamento
     unsigned int activations;           // métrica de número de ativações
-    // ... (outros campos serão adicionados mais tarde)
+    struct task_t *joined;              // task join queue
 } task_t;
 
 // estrutura que define um semáforo

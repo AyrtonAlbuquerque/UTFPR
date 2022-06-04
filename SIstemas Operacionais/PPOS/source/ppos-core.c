@@ -142,6 +142,8 @@ int task_create(task_t *task, void (*start_func)(void *), void *arg) {
 }
 
 void task_exit(int exitCode) {
+    task_t *task;
+
 #ifdef DEBUG
     printf("[PPOS-CORE|EXIT]: The task %d will be terminated.\n", current_task->id);
 #endif
@@ -157,6 +159,14 @@ void task_exit(int exitCode) {
         // Update current task state and exit code
         current_task->status = TASK_TERMINATED;
         current_task->exitCode = exitCode;
+        // Insert joined tasks in ready queue
+        while (queue_size((queue_t *) current_task->joined) > 0) {
+            task = current_task->joined;
+            queue_remove((queue_t **) &current_task->joined, (queue_t *) current_task->joined);
+            queue_append((queue_t **) &ready, (queue_t *) task);
+        }
+        // Insert current task in terminated queue
+        queue_append((queue_t **) &terminated, (queue_t *) current_task);
         // Switch to dispatcher
         task_switch(&dispatcher_task);
     }
@@ -267,6 +277,46 @@ int task_getprio(task_t *task) {
     task = !task ? current_task : task;
 
     return task->prio;
+}
+
+int task_join(task_t *task) {
+    // If the task is not valid, return -1
+    if (task) {
+        // If the task has already been terminated, return exitCode
+        if (task->status == TASK_TERMINATED)
+            return task->exitCode;
+        // Suspend and insert the current task in the task joined queue
+        current_task->status = TASK_SUSPENDED;
+        queue_append((queue_t **) &task->joined, (queue_t *) current_task);
+        // Switch to dispatcher and return exitCode
+        task_switch(&dispatcher_task);
+        return task->exitCode;
+    } else
+        return -1;
+}
+
+void task_suspend(task_t **queue) {
+    if (queue) {
+        // Remove the current task from the ready queue
+        queue_remove((queue_t **) &ready, (queue_t *) current_task);
+        // Set current task status to suspended
+        current_task->status = TASK_SUSPENDED;
+        // Insert the current task in the pointed queue
+        queue_append((queue_t **) queue, (queue_t *) current_task);
+        // Switch to dispatcher
+        task_switch(&dispatcher_task);
+    }
+}
+
+void task_resume(task_t *task, task_t **queue) {
+    if (task && queue) {
+        // Remove task from queue
+        queue_remove((queue_t **) queue, (queue_t *) task);
+        // Set task status to ready
+        task->status = TASK_READY;
+        // Insert task in ready queue
+        queue_append((queue_t **) &ready, (queue_t *) task);
+    }
 }
 
 void timer_handler(int signum) {
