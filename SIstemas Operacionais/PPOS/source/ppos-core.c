@@ -12,7 +12,7 @@ int task_index = 1;
 int quantum;
 task_t main_task, dispatcher_task;
 task_t *current_task;
-task_t *ready, *executing, *suspended, *terminated;
+task_t *ready, *executing, *suspended, *terminated, *sleeping;
 struct sigaction action;
 struct itimerval timer;
 unsigned int systick;
@@ -229,10 +229,31 @@ task_t *scheduler() {
 
 void dispatcher() {
     task_t *task;
+    int size;
 
     // Dispatcher runs in a loop
     while (1) {
-        // Get the task from the scheduler
+        size = queue_size((queue_t *) sleeping);
+        // If there are sleeping tasks
+        if (size > 0) {
+            task = sleeping;
+            // for each task in sleeping queue
+            for (int i = 0; i < size; i++) {
+                // Save next task in case of queue remove
+                task_t *next = task->next;
+                // If the task should wake
+                if (task->wakeTime <= systime()) {
+                    // Remove the task from sleeping queue
+                    queue_remove((queue_t **) &sleeping, (queue_t *) task);
+                    // Insert the task in the ready queue
+                    queue_append((queue_t **) &ready, (queue_t *) task);
+                }
+                // Set pointer to next task
+                task = next;
+            }
+        }
+
+        // Get a task from the scheduler
         task = scheduler();
 
         // if valid task
@@ -257,7 +278,9 @@ void dispatcher() {
                     break;
             }
         } else {
-            break;
+            // If there are no sleeping or ready tasks, exit
+            if (size == 0) { task_exit(0); }
+            continue;
         }
     }
     task_exit(0);
@@ -316,6 +339,22 @@ void task_resume(task_t *task, task_t **queue) {
         task->status = TASK_READY;
         // Insert task in ready queue
         queue_append((queue_t **) &ready, (queue_t *) task);
+    }
+}
+
+void task_sleep(int t) {
+    // If sleep time is greater than 0
+    if (t > 0) {
+        // Set current task status to sleeping
+        current_task->status = TASK_SLEEPING;
+        // Set current task wake time
+        current_task->wakeTime = systime() + t;
+        // Remove current task from ready queue
+        queue_remove((queue_t **) &ready, (queue_t *) current_task);
+        // Insert current task in sleeping queue
+        queue_append((queue_t **) &sleeping, (queue_t *) current_task);
+        // Switch to dispatcher
+        task_switch(&dispatcher_task);
     }
 }
 

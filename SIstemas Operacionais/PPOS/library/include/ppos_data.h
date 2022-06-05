@@ -22,6 +22,7 @@ typedef struct task_t {
     unsigned int startTime;             // métrica de tempo de início
     unsigned int cpuTime;               // métrica de tempo de processamento
     unsigned int activations;           // métrica de número de ativações
+    unsigned int wakeTime;              // awake time
     struct task_t *joined;              // task join queue
 } task_t;
 
@@ -55,6 +56,7 @@ typedef struct {
 #define TASK_EXECUTING      2
 #define TASK_SUSPENDED      3
 #define TASK_TERMINATED     4
+#define TASK_SLEEPING       6
 
 /* -------------------------------- Stacksize ------------------------------- */
 #define STACKSIZE           32768
