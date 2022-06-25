@@ -1,41 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="99037a92-9775-4c13-abcd-09fcb769ee54" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Backend.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/Oficina3.postman_collection.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/EfficientNetB4_150E_6C.hdf5" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/InceptionV3_150E_6C.hdf5" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/MobileNetV2_150E_6C.hdf5" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/ResNet50V2_150E_6C.hdf5" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/run-postgree-docker.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/blueprints/classification.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/blueprints/transaction.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/blueprints/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/dao/classification_dao.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/dao/transaction_dao.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/dao/user_dao.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/database.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/exceptions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/auth_policy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/jwt.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/label_to_credits.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/network_interface.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/password.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/redeem_code.py" afterDir="false" />
-    </list>
+    <list default="true" id="99037a92-9775-4c13-abcd-09fcb769ee54" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -82,20 +48,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Flask server.Backend">
     <configuration name="database" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="Backend" />
@@ -146,6 +112,7 @@
       <workItem from="1656192369716" duration="588000" />
       <workItem from="1656193014059" duration="1871000" />
       <workItem from="1656194946695" duration="645000" />
+      <workItem from="1656197036467" duration="11000" />
     </task>
     <servers />
   </component>
