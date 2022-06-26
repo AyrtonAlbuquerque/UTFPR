@@ -16,10 +16,10 @@
 /* -------------------------------------------------------------------------- */
 /*                                   Globals                                  */
 /* -------------------------------------------------------------------------- */
-const char *ssid = "AndroidAP";
-const char *password = "gisi6622";
-const String url = "http://192.168.0.239:8081/classifications/request";
-const String host = "192.168.0.239";
+const char *ssid = "BIOINFO-IC";
+const char *password = "b10cp3g1";
+const String url = "http://192.168.100.12:8081/classifications/request";
+const String host = "192.168.100.12";
 const String recyclerID = "1";
 const String bound = "boundry";
 const int port = 8081;
