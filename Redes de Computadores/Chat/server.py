@@ -9,7 +9,6 @@ import sys
 import json
 import socket
 import threading
-import contextlib
 from contextlib import suppress
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
@@ -22,7 +21,7 @@ def resource(relative_path):
     try:
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath("server")
+        base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
 
@@ -70,7 +69,7 @@ class Server(QMainWindow):
 
             self.history.verticalScrollBar().setValue(self.history.verticalScrollBar().maximum())
 
-    def update(self, excludes: []):
+    def update(self, excludes: list):
         clients = self.connections.copy()
 
         for client in clients.values():
