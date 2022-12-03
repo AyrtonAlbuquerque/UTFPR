@@ -74,7 +74,7 @@ This project was created using [Python 3.11](https://www.python.org/downloads/re
 
 ## Installation
 
-After installing [Python 3.11](https://www.python.org/downloads/release/python-3110/) and cloning the this repo to your computer, you need to create a virtual environment to be able to compile the project, usually named `venv`.
+After installing [Python 3.11](https://www.python.org/downloads/release/python-3110/) and cloning this repo to your computer, you need to create a virtual environment to be able to compile the project, usually named `venv`.
 
 1. Clone the repository
 
@@ -143,18 +143,18 @@ After that simply click in `Convert .PY to .EXE` and wait unitl the process is f
 
 Repeat the same steps for the `client.py` script to generate the `client.exe` executable.
 
-Alternatively the [pyinstaller](https://pypi.org/project/pyinstaller/) package can be used to generate the executables, since the [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) tool uses it under the hood. The follwing command should generate the same results, where `PATH` is the path up to the `Chat` folder.
+Alternatively the [pyinstaller](https://pypi.org/project/pyinstaller/) package can be used to generate the executables, since the [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) tool uses it under the hood. The follwing command should generate the same results, where `PATH` is the path up to the `Chat` folder in you machine.
 
 1. For the server application
 
 ```sh
-pyinstaller --noconfirm --onefile --windowed --icon "`PATH`/Chat/images/icon.ico" --add-data "`PATH`/Chat/images;images/" --add-data "`PATH`/Chat/ui;ui/"  "`PATH`/Chat/server.py"
+pyinstaller --noconfirm --onefile --windowed --icon "PATH/Chat/images/icon.ico" --add-data "PATH/Chat/images;images/" --add-data "PATH/Chat/ui;ui/"  "PATH/Chat/server.py"
 ```
 
 2. For the client application
 
 ```sh
-pyinstaller --noconfirm --onefile --windowed --icon "`PATH`/Chat/images/icon.ico" --add-data "`PATH`/Chat/images;images/" --add-data "`PATH`/Chat/ui;ui/"  "`PATH`/Chat/client.py"
+pyinstaller --noconfirm --onefile --windowed --icon "PATH/Chat/images/icon.ico" --add-data "PATH/Chat/images;images/" --add-data "PATH/Chat/ui;ui/"  "PATH/Chat/client.py"
 ```
 
 ## Debugging
