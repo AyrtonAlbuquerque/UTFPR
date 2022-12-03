@@ -13,7 +13,7 @@ from contextlib import suppress
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QListWidget, QLineEdit, QTextEdit, QPushButton, QColorDialog, QListWidgetItem, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QColorDialog, QListWidgetItem
 from PyQt5.uic import loadUi
 
 

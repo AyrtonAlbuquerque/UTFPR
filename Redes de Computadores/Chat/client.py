@@ -14,7 +14,7 @@ from contextlib import suppress
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QListWidget, QLineEdit, QTextEdit, QPushButton, QColorDialog, QListWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QColorDialog, QListWidgetItem
 from PyQt5.uic import loadUi
 
 
@@ -56,7 +56,7 @@ class Client(QMainWindow):
         self.name.setReadOnly(False)
         self.start.setIcon(QIcon(QtGui.QPixmap(resource("images/Start.png"))))
         self.status.setPixmap(QtGui.QPixmap(resource("images/Off.png")))
-        self.append(self.name.text(), "Você foi desconectado", self.color.name(), "center")
+        self.append(self.name.text(), "Você foi desconectado", "#000000", "center")
 
     def connect(self):
         self.connected = True
