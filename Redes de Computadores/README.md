@@ -38,7 +38,7 @@ The server `IP` and `Name` can not be modified, being set by default by the appl
 
 Whenever a client connects his/her name will be added to the list containing all connected clients at the left corner. To send a message from the server to a specific or a group of clients simply select the desired clients in the list and send the message. When no clients are selected the server will broadcast the message to all connected clients.
 
-It's also possible to kick a specific or a group of clients by selecting them in the list and clicking the <img src="Chat/images/Kick.png" width="24px" height="24px"> button. The server displays the events and exchanged messages in the text history area, where significant events are aligned in the middle, client messages aligned left and broadcasted messages from server aligned right.
+It's also possible to kick a specific or a group of clients by selecting them in the list and clicking the <img src="Chat/images/kick.png" width="24px" height="24px"> button. The server displays the events and exchanged messages in the text history area, where significant events are aligned in the middle, client messages aligned left and broadcasted messages from server aligned right.
 
 To stop the server simply click the <img src="Chat/images/Stop.png" width="24px" height="24px"> button or close the application.
 
