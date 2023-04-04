@@ -1,4 +1,4 @@
-﻿namespace RabbitMQ
+﻿namespace RabbitMQ.Setup
 {
     class Program
     {
@@ -8,6 +8,7 @@
             {
                 Console.WriteLine("Setup successful, press any key to terminate...");
                 Console.ReadLine();
+                Console.WriteLine("Setup termianted");
             }
         }
     }

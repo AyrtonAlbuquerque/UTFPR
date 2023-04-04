@@ -1,8 +1,9 @@
 using RabbitMQ.Client;
 using RabbitMQ.Exchanges;
 using RabbitMQ.Queues;
+using RabbitMQ.Bindings;
 
-namespace RabbitMQ
+namespace RabbitMQ.Setup
 {
     public class Startup : IDisposable
     {
@@ -39,26 +40,29 @@ namespace RabbitMQ
 
         private void CreateExchanges()
         {
-            _channel.ExchangeDeclare(Exchange.Fanout, "fanout", true, false, null);
+            _channel.ExchangeDeclare(Exchange.Direct, "direct", true, false, null);
         }
 
         private void CreateQueues()
         {
-            _channel.QueueDeclare(Queue.First, true, false, false, null);
-            _channel.QueueDeclare(Queue.Second, true, false, false, null);
-            _channel.QueueBind(Queue.First, Exchange.Fanout, "");
-            _channel.QueueBind(Queue.Second, Exchange.Fanout, "");
+            _channel.QueueDeclare(Queue.Information, true, false, false, null);
+            _channel.QueueDeclare(Queue.Warning, true, false, false, null);
+            _channel.QueueDeclare(Queue.Error, true, false, false, null);
+            _channel.QueueBind(Queue.Information, Exchange.Direct, Binding.Information);
+            _channel.QueueBind(Queue.Warning, Exchange.Direct, Binding.Warning);
+            _channel.QueueBind(Queue.Error, Exchange.Direct, Binding.Error);
         }
 
         private void DeleteExchanges()
         {
-            _channel.ExchangeDelete(Exchange.Fanout);
+            _channel.ExchangeDelete(Exchange.Direct);
         }
 
         private void DeleteQueues()
         {
-            _channel.QueueDelete(Queue.First);
-            _channel.QueueDelete(Queue.Second);
+            _channel.QueueDelete(Queue.Information);
+            _channel.QueueDelete(Queue.Warning);
+            _channel.QueueDelete(Queue.Error);
         }
     }
 }

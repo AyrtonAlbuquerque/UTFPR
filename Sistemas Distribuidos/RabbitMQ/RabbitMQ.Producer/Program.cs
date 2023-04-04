@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Exchanges;
+﻿using RabbitMQ.Bindings;
+using RabbitMQ.Exchanges;
 
 namespace RabbitMQ.Producer
 {
@@ -9,7 +10,6 @@ namespace RabbitMQ.Producer
             var selected = false;
             var exit = false;
             var option = 1;
-            string exchange;
             string routingKey;
 
             using (var producer = new Producer("localhost", 5672))
@@ -40,28 +40,7 @@ namespace RabbitMQ.Producer
                     }
                 }
 
-                switch (option)
-                {
-                    case 1:
-                        exchange = Exchange.Fanout;
-                        routingKey = "information.log";
-                        break;
-
-                    case 2:
-                        exchange = Exchange.Fanout;
-                        routingKey = "warning.log";
-                        break;
-
-                    case 3:
-                        exchange = Exchange.Fanout;
-                        routingKey = "error.log";
-                        break;
-
-                    default:
-                        exchange = Exchange.Fanout;
-                        routingKey = "";
-                        break;
-                }
+                routingKey = (option == 1 ? Binding.Information : (option == 2 ? Binding.Warning : Binding.Error));
 
                 while (!exit)
                 {
@@ -73,7 +52,7 @@ namespace RabbitMQ.Producer
                         if (message == "exit")
                             exit = true;
                         else
-                            producer.Publish(exchange, routingKey, message);
+                            producer.Publish(Exchange.Direct, routingKey, message);
                     }
                 }
 
