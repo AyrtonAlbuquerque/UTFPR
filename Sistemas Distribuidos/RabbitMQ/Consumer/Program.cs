@@ -1,18 +1,25 @@
-﻿using RabbitMQ.Queues;
+﻿using RabbitMQ.Client.Events;
+using RabbitMQ.Queues;
+using RabbitMQ.Subscriber;
+using System.Text;
 
-namespace RabbitMQ.Consumer
+namespace Consumer
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static Subscriber consumer;
+
+        private static void Main(string[] args)
         {
             var selected = false;
             var option = 1;
 
-            using (var consumer = new Consumer("localhost", 5672))
+            consumer = new Subscriber("localhost", 5672, Receive);
+
+            try
             {
                 Console.WriteLine("Choose a topic to subscribe to: ");
-                (int left, int top) = Console.GetCursorPosition();
+                var (left, top) = Console.GetCursorPosition();
 
                 while (!selected)
                 {
@@ -37,22 +44,27 @@ namespace RabbitMQ.Consumer
                     }
                 }
 
-                switch (option)
-                {
-                    case 1:
-                        consumer.Subscribe(Queue.Information);
-                        break;
-                    case 2:
-                        consumer.Subscribe(Queue.Warning);
-                        break;
-                    case 3:
-                        consumer.Subscribe(Queue.Error);
-                        break;
-                }
-
+                consumer.Subscribe(option == 1 ? Queue.Information : option == 2 ? Queue.Warning : Queue.Error);
                 Console.WriteLine("Listening... Press any key to exit");
                 Console.ReadLine();
-                Console.WriteLine("Consumer termianted");
+            }
+            finally
+            {
+                consumer.Dispose();
+            }
+        }
+
+        private static void Receive(object? sender, BasicDeliverEventArgs e)
+        {
+            try
+            {
+                Console.WriteLine($"Message: {Encoding.UTF8.GetString(e.Body.ToArray())}");
+                consumer.channel.BasicNack(e.DeliveryTag, false, false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ocorreu um erro ao processar a mensagem recebida: {(ex.InnerException ?? ex).Message}. Requeuing");
+                consumer.channel.BasicNack(e.DeliveryTag, false, true);
             }
         }
     }

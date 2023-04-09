@@ -1,21 +1,23 @@
 ﻿using RabbitMQ.Bindings;
 using RabbitMQ.Exchanges;
+using RabbitMQ.Publisher;
 
-namespace RabbitMQ.Producer
+namespace Producer
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var selected = false;
             var exit = false;
             var option = 1;
             string routingKey;
+            var producer = new Publisher("localhost", 5672);
 
-            using (var producer = new Producer("localhost", 5672))
+            try
             {
                 Console.WriteLine("Choose a topic to publish to: ");
-                (int left, int top) = Console.GetCursorPosition();
+                var (left, top) = Console.GetCursorPosition();
 
                 while (!selected)
                 {
@@ -40,7 +42,7 @@ namespace RabbitMQ.Producer
                     }
                 }
 
-                routingKey = (option == 1 ? Binding.Information : (option == 2 ? Binding.Warning : Binding.Error));
+                routingKey = option == 1 ? Binding.Information : option == 2 ? Binding.Warning : Binding.Error;
 
                 while (!exit)
                 {
@@ -50,13 +52,19 @@ namespace RabbitMQ.Producer
                     if (!string.IsNullOrEmpty(message))
                     {
                         if (message == "exit")
+                        {
                             exit = true;
+                        }
                         else
+                        {
                             producer.Publish(Exchange.Direct, routingKey, message);
+                        }
                     }
                 }
-
-                Console.WriteLine("Producer termianted");
+            }
+            finally
+            {
+                producer.Dispose();
             }
         }
     }

@@ -1,19 +1,26 @@
+using RabbitMQ.Bindings;
 using RabbitMQ.Client;
 using RabbitMQ.Exchanges;
 using RabbitMQ.Queues;
-using RabbitMQ.Bindings;
 
-namespace RabbitMQ.Setup
+namespace RabbitMQ
 {
     public class Startup : IDisposable
     {
-        private IConnection _connection;
         private IModel _channel;
+        private IConnection _connection;
 
         public Startup(string host, int port)
         {
-            if (string.IsNullOrEmpty(host)) throw new Exception("O IP do host precisa ser informado");
-            if (port < 0 || port > 65535) throw new Exception($"O valor da porta {port} é inválido");
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new Exception("O IP do host precisa ser informado");
+            }
+
+            if (port < 0 || port > 65535)
+            {
+                throw new Exception($"O valor da porta {port} é inválido");
+            }
 
             var factory = new ConnectionFactory
             {
