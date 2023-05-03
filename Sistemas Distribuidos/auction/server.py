@@ -74,6 +74,8 @@ class Auction:
                 return "Bid refused, auction is closed for this item."
         except rsa.VerificationError:
             return "Bid refused, invalid signature."
+        except KeyError:
+            return "Bid refused, item not found."
 
     @expose
     def list(self) -> list:
@@ -82,7 +84,7 @@ class Auction:
     @expose
     def register(self, uri: str, name: str, description: str, value: float, expiration: datetime) -> dict:
         try:
-            time = datetime.strptime(expiration, "%d/%m/%Y %H:%M:%S")
+            time = datetime.strptime(expiration, "%Y-%m-%dT%H:%M:%S")
             item = {
                 "id": self.id,
                 "owner": uri,
