@@ -21,6 +21,7 @@ class Auction:
     def __init__(self):
         self.id = 1
         self.clients = []
+        self.proxy = {}
         self.items = {}
 
     @expose
@@ -28,11 +29,13 @@ class Auction:
         try:
             for client in self.clients[:]:
                 try:
-                    Proxy(client["uri"]).notify(f"{name} has entered the auction.")
+                    self.proxy[client["uri"]]._pyroClaimOwnership()
+                    self.proxy[client["uri"]].notify(f"{name} has entered the auction.")
                 except:
                     if client in self.clients:
                         self.clients.remove(client)
 
+            self.proxy[uri] = Proxy(uri)
             client = {"uri": uri, "name": name, "key": rsa.PublicKey(key[0], key[1])}
 
             if client not in self.clients:
@@ -62,7 +65,8 @@ class Auction:
                     for bider in item['biders'][:]:
                         if bider != uri:
                             try:
-                                Proxy(bider).notify(f"{client['name']} now has the highest bid on item ({item['id']}): {item['name']} for: R$ {item['value']}.")
+                                self.proxy[bider]._pyroClaimOwnership()
+                                self.proxy[bider].notify(f"{client['name']} now has the highest bid on item ({item['id']}): {item['name']} for: R$ {item['value']}.")
                             except:
                                 if bider in item['biders']:
                                     item['biders'].remove(bider)
@@ -104,7 +108,8 @@ class Auction:
 
                 for client in self.clients[:]:
                     try:
-                        Proxy(client["uri"]).notify(f"A new item is up for auction ({item['id']}): {item['name']} - R$ {item['value']}. Expires at: {item['expiration']}.")
+                        self.proxy[client["uri"]]._pyroClaimOwnership()
+                        self.proxy[client["uri"]].notify(f"A new item is up for auction ({item['id']}): {item['name']} - R$ {item['value']}. Expires at: {item['expiration']}.")
                     except:
                         if client in self.clients:
                             self.clients.remove(client)
@@ -137,7 +142,8 @@ class Auction:
 
         for bider in item['biders'][:]:
             try:
-                Proxy(bider).notify(f"Auction closed for item ({item['id']}): {item['name']}. {client['name']} won with a bid of: R$ {item['value']}.")
+                self.proxy[bider]._pyroClaimOwnership()
+                self.proxy[bider].notify(f"Auction closed for item ({item['id']}): {item['name']}. {client['name']} won with a bid of: R$ {item['value']}.")
             except:
                 if bider in item['biders']:
                     item['biders'].remove(bider)
