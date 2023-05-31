@@ -1,0 +1,5 @@
+pyqt6-tools==6.4.2.3.3
+PyQt6==6.4.2
+rsa==4.9
+requests==2.31.0
+sseclient-py==1.7.2
